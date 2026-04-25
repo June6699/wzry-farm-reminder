@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>王者农场自动提醒</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark">H</div>
+          <div>
+            <p class="brand-kicker">Honor of Kings</p>
+            <h1>王者农场自动提醒</h1>
+          </div>
+        </div>
+
+        <div class="sidebar-profile" id="sidebar-profile"></div>
+
+        <nav class="nav-stack" aria-label="主导航">
+          <button class="nav-item active" data-section="home">首页</button>
+          <button class="nav-item" data-section="farm">农场</button>
+          <button class="nav-item" data-section="planner">规划</button>
+          <button class="nav-item" data-section="stats">统计</button>
+          <button class="nav-item" data-section="theft">偷菜登记</button>
+          <button class="nav-item" data-section="settings">设置</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-pill" id="sidebar-safe-window">防偷窗口加载中</div>
+          <div class="sidebar-pill sidebar-pill-blue" id="sidebar-slot-count">已开格子加载中</div>
+        </div>
+      </aside>
+
+      <main class="main-shell">
+        <header class="topbar card">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2 id="topbar-title">下午好，农场主</h2>
+          </div>
+          <div class="topbar-metrics">
+            <div class="topbar-chip">
+              <span>当前余额</span>
+              <strong id="topbar-balance">0</strong>
+            </div>
+            <div class="topbar-chip">
+              <span>今天净收益</span>
+              <strong id="topbar-net">0</strong>
+            </div>
+          </div>
+        </header>
+
+        <datalist id="crop-search-datalist"></datalist>
+
+        <section class="section-panel active" id="section-home">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Wallet & Rhythm</p>
+              <h3>钱包与总览</h3>
+            </div>
+          </div>
+
+          <div class="summary-grid" id="wallet-summary-grid"></div>
+
+          <div class="two-panel-grid">
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Ledger</p>
+                  <h4>钱包流水</h4>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="ledger-table">
+                  <thead>
+                    <tr>
+                      <th>日期</th>
+                      <th>类型</th>
+                      <th>金额</th>
+                      <th>余额</th>
+                      <th>说明</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ledger-table-body"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Current State</p>
+                  <h4>当前农场概况</h4>
+                </div>
+              </div>
+              <div id="home-farm-summary" class="stack-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-panel" id="section-farm">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Farm Court</p>
+              <h3>格子级农场管理</h3>
+              <p class="section-copy">按格子解锁、按格子规划、按格子编辑。四块地固定为 2 × 2 摆放，每块地内部为 4 × 3。</p>
+            </div>
+            <div class="section-actions">
+              <label class="inline-field">
+                <span>已开格子数</span>
+                <input id="farm-unlocked-slot-count" type="number" min="1" max="48">
+              </label>
+              <button class="ghost-button" id="farm-save-slot-count">更新格子数</button>
+            </div>
+          </div>
+
+          <div class="summary-grid compact-grid" id="farm-summary-grid"></div>
+
+          <div class="two-panel-grid">
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Editor</p>
+                  <h4>批量 / 单格编辑</h4>
+                </div>
+              </div>
+              <form id="farm-editor-form" class="editor-grid">
+                <label>
+                  <span>编辑范围</span>
+                  <select id="farm-scope-mode">
+                    <option value="all">全部已开格子</option>
+                    <option value="field">某一整块地</option>
+                    <option value="slot">某一个格子</option>
+                  </select>
+                </label>
+                <label>
+                  <span>地块</span>
+                  <select id="farm-scope-field"></select>
+                </label>
+                <label>
+                  <span>格子</span>
+                  <select id="farm-scope-slot"></select>
+                </label>
+                <label>
+                  <span>作物搜索</span>
+                  <input id="farm-edit-crop-search" type="search" list="crop-search-datalist" placeholder="输入香蕉、蓝莓、辣椒...">
+                  <input id="farm-edit-crop-id" type="hidden">
+                </label>
+                <label>
+                  <span>状态</span>
+                  <select id="farm-edit-phase">
+                    <option value="planned">已规划</option>
+                    <option value="planted">已种植</option>
+                  </select>
+                </label>
+                <label>
+                  <span>开始时间</span>
+                  <input id="farm-edit-start-at" type="datetime-local">
+                </label>
+                <label>
+                  <span>收获时间</span>
+                  <input id="farm-edit-harvest-at" type="datetime-local">
+                </label>
+                <label>
+                  <span>浇水时间</span>
+                  <input id="farm-water-at" type="datetime-local">
+                </label>
+                <label>
+                  <span>本次扣时（分钟）</span>
+                  <input id="farm-water-reduce" type="number" min="1" max="999">
+                </label>
+                <label class="full-span">
+                  <span>备注</span>
+                  <input id="farm-edit-note" type="text" placeholder="比如：这个格子打算种别的，不跟默认方案走。">
+                </label>
+                <div class="full-span">
+                  <span class="field-label" id="farm-water-hint">选择已种植格子后，这里会给出推荐浇水减时。</span>
+                </div>
+                <div class="editor-actions full-span">
+                  <button class="accent-button" type="submit">更新所选</button>
+                  <button class="ghost-button" type="button" id="farm-start-button">手动开始种植</button>
+                  <button class="ghost-button" type="button" id="farm-water-button">登记浇水</button>
+                  <button class="ghost-button" type="button" id="farm-harvest-button">登记收获</button>
+                  <button class="ghost-button danger" type="button" id="farm-clear-button">清空所选</button>
+                </div>
+              </form>
+              <div id="farm-editor-feedback" class="feedback-area muted">点一个格子就能快速切到“单格编辑”。</div>
+            </article>
+
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Quick Summary</p>
+                  <h4>当前方案收入预估</h4>
+                </div>
+              </div>
+              <div id="farm-plan-summary" class="stack-list"></div>
+            </article>
+          </div>
+
+          <div id="farm-layout" class="farm-layout"></div>
+        </section>
+
+        <section class="section-panel" id="section-planner">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Planner</p>
+              <h3>周末双倍 / 防偷倒推</h3>
+              <p class="section-copy">生成完方案后可以直接应用到已开格子，然后去农场页做个别格子的微调。</p>
+            </div>
+          </div>
+
+          <article class="card">
+            <form id="planner-form" class="planner-grid">
+              <label>
+                <span>作物搜索</span>
+                <input id="planner-crop-search" type="search" list="crop-search-datalist" placeholder="输入作物名搜索">
+                <input id="planner-crop-id" type="hidden">
+              </label>
+              <label>
+                <span>计划格子数</span>
+                <input id="planner-slot-count" type="number" min="1" max="48">
+              </label>
+              <button class="accent-button" type="submit">生成方案</button>
+            </form>
+          </article>
+
+          <div id="planner-results" class="planner-results"></div>
+          <div id="planner-feedback" class="feedback-area muted">还没有生成新的规划方案。</div>
+        </section>
+
+        <section class="section-panel" id="section-stats">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Activity Atlas</p>
+              <h3>操作时间分布图</h3>
+              <p class="section-copy">横轴是日期，纵轴是时间；不同颜色的点分别表示种植、浇水、收获、被偷菜和偷别人菜。</p>
+            </div>
+          </div>
+
+          <div class="two-panel-grid wide-chart">
+            <article class="card">
+              <div class="stats-toolbar">
+                <label>
+                  <span>筛选月份</span>
+                  <select id="stats-month-filter"></select>
+                </label>
+                <div>
+                  <span class="field-label">显示事件</span>
+                  <div id="stats-type-filter" class="legend-switch"></div>
+                </div>
+              </div>
+              <div class="chart-shell">
+                <div id="chart-tooltip" class="chart-tooltip"></div>
+                <svg id="stats-chart" viewBox="0 0 1200 560" role="img" aria-label="时间分布图"></svg>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Snapshot</p>
+                  <h4>筛选结果概览</h4>
+                </div>
+              </div>
+              <div id="stats-summary-grid" class="stack-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-panel" id="section-theft">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Raid Ledger</p>
+              <h3>偷菜进出账</h3>
+              <p class="section-copy">被偷时必须填偷菜人；偷别人时可以填受害者，也可以不填。</p>
+            </div>
+          </div>
+
+          <div class="two-panel-grid">
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Inbound</p>
+                  <h4>别人偷了我的菜</h4>
+                </div>
+              </div>
+              <form id="inbound-raid-form" class="editor-grid">
+                <label>
+                  <span>时间</span>
+                  <input id="inbound-occurred-at" type="datetime-local">
+                </label>
+                <label>
+                  <span>格子</span>
+                  <input id="inbound-slot-id" type="text" placeholder="比如 F1-R1-C1">
+                </label>
+                <label>
+                  <span>作物搜索</span>
+                  <input id="inbound-crop-search" type="search" list="crop-search-datalist" placeholder="搜索作物">
+                  <input id="inbound-crop-id" type="hidden">
+                </label>
+                <label>
+                  <span>数量</span>
+                  <input id="inbound-quantity" type="number" min="1" max="999" value="1">
+                </label>
+                <label>
+                  <span>偷菜人（必填）</span>
+                  <input id="inbound-counterparty" type="text" placeholder="比如：好友 A">
+                </label>
+                <label class="toggle-line">
+                  <input id="inbound-weekend" type="checkbox">
+                  <span>发生在周末双倍窗口</span>
+                </label>
+                <label class="full-span">
+                  <span>备注</span>
+                  <textarea id="inbound-note" rows="3"></textarea>
+                </label>
+                <button class="accent-button full-span" type="submit">登记损失</button>
+              </form>
+            </article>
+
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Outbound</p>
+                  <h4>我去偷了别人的菜</h4>
+                </div>
+              </div>
+              <form id="outbound-raid-form" class="editor-grid">
+                <label>
+                  <span>时间</span>
+                  <input id="outbound-occurred-at" type="datetime-local">
+                </label>
+                <label>
+                  <span>受害者（可空）</span>
+                  <input id="outbound-counterparty" type="text" placeholder="可以不填">
+                </label>
+                <label>
+                  <span>作物搜索</span>
+                  <input id="outbound-crop-search" type="search" list="crop-search-datalist" placeholder="搜索作物">
+                  <input id="outbound-crop-id" type="hidden">
+                </label>
+                <label>
+                  <span>数量</span>
+                  <input id="outbound-quantity" type="number" min="1" max="999" value="1">
+                </label>
+                <label class="toggle-line">
+                  <input id="outbound-weekend" type="checkbox">
+                  <span>发生在周末双倍窗口</span>
+                </label>
+                <label class="full-span">
+                  <span>备注</span>
+                  <textarea id="outbound-note" rows="3"></textarea>
+                </label>
+                <button class="accent-button full-span" type="submit">登记收入</button>
+              </form>
+            </article>
+          </div>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Recent Raids</p>
+                <h4>最近偷菜记录</h4>
+              </div>
+            </div>
+            <div id="raid-list" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="section-panel" id="section-settings">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Config</p>
+              <h3>设置</h3>
+            </div>
+          </div>
+
+          <article class="card">
+            <form id="settings-form" class="settings-grid">
+              <div class="settings-block">
+                <h4>玩家资料</h4>
+                <label><span>昵称</span><input id="player-nickname" type="text"></label>
+                <label><span>游戏 ID</span><input id="player-game-id" type="text"></label>
+                <label><span>等级</span><input id="player-level" type="number" min="1" max="100"></label>
+                <label><span>头像路径</span><input id="player-avatar-path" type="text"></label>
+                <label><span>小摊加成（%）</span><input id="player-stall-bonus" type="number" min="0" max="200"></label>
+              </div>
+
+              <div class="settings-block">
+                <h4>格子与提醒</h4>
+                <label><span>已开格子数</span><input id="settings-unlocked-slot-count" type="number" min="1" max="48"></label>
+                <label><span>操作预留时间（分钟）</span><input id="notify-buffer" type="number" min="0" max="120"></label>
+                <label><span>播种提前提醒（分钟）</span><input id="notify-plant-ahead" type="number" min="0" max="120"></label>
+                <label><span>浇水提前提醒（分钟）</span><input id="notify-water-ahead" type="number" min="0" max="180"></label>
+                <label><span>收获提前提醒（分钟）</span><input id="notify-harvest-ahead" type="number" min="0" max="180"></label>
+              </div>
+
+              <div class="settings-block">
+                <h4>规划策略</h4>
+                <label><span>周末目标收获时间</span><input id="planner-weekend-target" type="time"></label>
+                <label class="toggle-line"><input id="planner-prefer-weekend" type="checkbox"><span>优先周末双倍</span></label>
+                <label class="toggle-line"><input id="planner-prefer-anti-theft" type="checkbox"><span>优先防偷</span></label>
+                <label class="toggle-line"><input id="planner-auto-watering" type="checkbox"><span>自动尝试浇水压缩</span></label>
+                <label><span>搜索范围（天）</span><input id="planner-search-horizon" type="number" min="3" max="30"></label>
+              </div>
+
+              <div class="settings-block">
+                <h4>防偷窗口</h4>
+                <label class="toggle-line"><input id="planner-anti-theft-enabled" type="checkbox"><span>启用防偷时间窗口</span></label>
+                <label><span>开始</span><input id="planner-safe-start" type="time"></label>
+                <label><span>结束</span><input id="planner-safe-end" type="time"></label>
+                <p class="settings-tip">这里改的是 UI 配置，不需要用户自己去改 config 文件。</p>
+              </div>
+
+              <button class="accent-button full-span" type="submit">保存设置</button>
+            </form>
+          </article>
+
+          <div id="settings-feedback" class="feedback-area muted">还没有保存新的设置。</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

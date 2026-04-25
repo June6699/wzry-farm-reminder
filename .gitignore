@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local runtime data
+data/app.db
+data/config.json
+data/assets/
+data/backup/
+
+# Local logs
+server.out.log
+server.err.log
+
+# Common local tooling
+.DS_Store
+.vscode/
+.idea/
+.venv/
+venv/
