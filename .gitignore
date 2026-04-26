@@ -12,6 +12,9 @@ data/backup/
 server.out.log
 server.err.log
 
+# project.md
+项目说明.md
+
 # Common local tooling
 .DS_Store
 .vscode/
