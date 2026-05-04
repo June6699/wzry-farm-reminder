@@ -1,0 +1,14 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+
+[*.{py,md,json,yml,yaml,txt}]
+end_of_line = lf
+
+[*.bat]
+end_of_line = crlf
+
+[*.md]
+trim_trailing_whitespace = false
