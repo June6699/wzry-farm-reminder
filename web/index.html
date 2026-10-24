@@ -6,15 +6,26 @@
     <title>王者农场自动提醒</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css">
+    <script>
+      // 防闪白：优先读本地缓存的主题，其次跟随系统偏好
+      (function () {
+        var theme = null;
+        try { theme = localStorage.getItem("farm-theme"); } catch (error) { /* ignore */ }
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand-block">
-          <div class="brand-mark">H</div>
+          <div class="brand-mark">农</div>
           <div>
             <p class="brand-kicker">Honor of Kings</p>
-            <h1>王者农场自动提醒</h1>
+            <h1>王者农场助手</h1>
           </div>
         </div>
 
@@ -24,12 +35,16 @@
           <button class="nav-item active" data-section="home">首页</button>
           <button class="nav-item" data-section="farm">农场</button>
           <button class="nav-item" data-section="planner">规划</button>
+          <button class="nav-item" data-section="profit">收益</button>
+          <button class="nav-item" data-section="bag">背包</button>
           <button class="nav-item" data-section="stats">统计</button>
           <button class="nav-item" data-section="theft">偷菜登记</button>
+          <button class="nav-item" data-section="exp">经验</button>
           <button class="nav-item" data-section="settings">设置</button>
         </nav>
 
         <div class="sidebar-footer">
+          <div class="sidebar-pill sidebar-pill-blue" id="sidebar-next-event">日程加载中</div>
           <div class="sidebar-pill" id="sidebar-safe-window">防偷窗口加载中</div>
           <div class="sidebar-pill sidebar-pill-blue" id="sidebar-slot-count">已开格子加载中</div>
         </div>
@@ -41,15 +56,18 @@
             <p class="eyebrow">Dashboard</p>
             <h2 id="topbar-title">下午好，农场主</h2>
           </div>
-          <div class="topbar-metrics">
-            <div class="topbar-chip">
-              <span>当前余额</span>
-              <strong id="topbar-balance">0</strong>
+          <div class="topbar-actions">
+            <div class="topbar-metrics">
+              <div class="topbar-chip">
+                <span>当前余额</span>
+                <strong id="topbar-balance">0</strong>
+              </div>
+              <div class="topbar-chip">
+                <span>今天净收益</span>
+                <strong id="topbar-net">0</strong>
+              </div>
             </div>
-            <div class="topbar-chip">
-              <span>今天净收益</span>
-              <strong id="topbar-net">0</strong>
-            </div>
+            <button class="theme-toggle" id="theme-toggle" type="button" title="切换亮色 / 暗黑主题" aria-label="切换主题">🌙</button>
           </div>
         </header>
 
@@ -89,15 +107,27 @@
               </div>
             </article>
 
-            <article class="card">
-              <div class="card-header">
-                <div>
-                  <p class="eyebrow">Current State</p>
-                  <h4>当前农场概况</h4>
+            <div class="stack-list">
+              <article class="card">
+                <div class="card-header">
+                  <div>
+                    <p class="eyebrow">Today</p>
+                    <h4>今日关键节点</h4>
+                  </div>
                 </div>
-              </div>
-              <div id="home-farm-summary" class="stack-list"></div>
-            </article>
+                <div id="home-clock-list" class="clock-list"></div>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <div>
+                    <p class="eyebrow">Current State</p>
+                    <h4>当前农场概况</h4>
+                  </div>
+                </div>
+                <div id="home-farm-summary" class="stack-list"></div>
+              </article>
+            </div>
           </div>
         </section>
 
@@ -172,6 +202,10 @@
                   <span>本次扣时（分钟）</span>
                   <input id="farm-water-reduce" type="number" min="1" max="999">
                 </label>
+                <div class="full-span">
+                  <span class="field-label">变异词条（8 级及以上作物可标记）</span>
+                  <div id="farm-mutation-options" class="exp-filter-tags"></div>
+                </div>
                 <label class="full-span">
                   <span>备注</span>
                   <input id="farm-edit-note" type="text" placeholder="比如：这个格子打算种别的，不跟默认方案走。">
@@ -187,7 +221,7 @@
                   <button class="ghost-button danger" type="button" id="farm-clear-button">清空所选</button>
                 </div>
               </form>
-              <div id="farm-editor-feedback" class="feedback-area muted">点一个格子就能快速切到“单格编辑”。</div>
+              <div id="farm-editor-feedback" class="feedback-area muted">点一个格子就能快速切到“单格编辑”。收获会产出果实进入背包，卖出后才入账。</div>
             </article>
 
             <article class="card">
@@ -201,7 +235,37 @@
             </article>
           </div>
 
-          <div id="farm-layout" class="farm-layout"></div>
+          <article class="card" style="margin-top:14px;">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Blessing</p>
+                <h4>祝福追踪</h4>
+              </div>
+              <div class="field-label">每日 05:00 重置 · 每株作物最多 3 次 · 每次祝福都是一次变异判定</div>
+            </div>
+            <div id="farm-blessing-panel"></div>
+            <form id="blessing-form" class="planner-grid" style="margin-top:12px;">
+              <label>
+                <span>方向</span>
+                <select id="bless-direction">
+                  <option value="given">我祝福了别人</option>
+                  <option value="received">别人祝福了我</option>
+                </select>
+              </label>
+              <label>
+                <span>好友（可空）</span>
+                <input id="bless-counterparty" type="text" placeholder="比如：好友 A">
+              </label>
+              <label>
+                <span>格子（可空，用于累计单株 3 次上限）</span>
+                <input id="bless-slot" type="text" placeholder="比如 F1-R1-C1">
+              </label>
+              <button class="accent-button" type="submit" style="align-self:end;">登记祝福</button>
+            </form>
+            <div id="blessing-feedback" class="feedback-area muted"></div>
+          </article>
+
+          <div id="farm-layout" class="farm-layout" style="margin-top:14px;"></div>
         </section>
 
         <section class="section-panel" id="section-planner">
@@ -230,6 +294,233 @@
 
           <div id="planner-results" class="planner-results"></div>
           <div id="planner-feedback" class="feedback-area muted">还没有生成新的规划方案。</div>
+        </section>
+
+        <section class="section-panel" id="section-profit">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Profit Lab</p>
+              <h3>收益计算器与卡等级</h3>
+              <p class="section-copy">把培育等级、小摊加成、周末双倍、2 级地、变异期望全部拆开算清楚。</p>
+            </div>
+          </div>
+
+          <article class="card">
+            <form id="calc-form" class="planner-grid">
+              <label>
+                <span>作物搜索</span>
+                <input id="calc-crop-search" type="search" list="crop-search-datalist" placeholder="输入作物名搜索">
+                <input id="calc-crop-id" type="hidden">
+              </label>
+              <label>
+                <span>培育等级（1-10）</span>
+                <input id="calc-cultivation-level" type="number" min="1" max="10" value="1">
+              </label>
+              <label>
+                <span>种植株数</span>
+                <input id="calc-plot-count" type="number" min="1" max="48" value="12">
+              </label>
+              <label class="toggle-line">
+                <input id="calc-weekend" type="checkbox">
+                <span>周末双倍（×2）</span>
+              </label>
+              <label class="toggle-line">
+                <input id="calc-tier2" type="checkbox">
+                <span>2 级地（产量 +50%）</span>
+              </label>
+              <label class="toggle-line">
+                <input id="calc-mutation" type="checkbox" checked>
+                <span>计入变异期望</span>
+              </label>
+            </form>
+            <div id="calc-summary" class="summary-grid compact-grid" style="margin-top:14px;"></div>
+            <div id="calc-breakdown" class="calc-breakdown" style="margin-top:14px;"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Level Advisor</p>
+                <h4>卡等级建议</h4>
+              </div>
+            </div>
+            <div id="calc-advisor" class="stack-list"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Crop Compare</p>
+                <h4>作物收益对比（已解锁）</h4>
+              </div>
+              <div class="field-label">按周末双倍口径的每格净收益排序，绿色行为当前推荐</div>
+            </div>
+            <div class="table-wrap" style="max-height:420px;overflow:auto;">
+              <table class="compare-table" id="calc-compare-table"></table>
+            </div>
+          </article>
+        </section>
+
+        <section class="section-panel" id="section-bag">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Bag & Collection</p>
+              <h3>背包与图鉴</h3>
+              <p class="section-copy">收获的果实先进背包，去小摊卖出才换农场币；变异果实可以留仓收藏或喂培育台。</p>
+            </div>
+          </div>
+
+          <div class="tab-bar" id="bag-tabs">
+            <button class="tab-item active" type="button" data-bag-tab="seeds">种子</button>
+            <button class="tab-item" type="button" data-bag-tab="fruits">果实</button>
+            <button class="tab-item" type="button" data-bag-tab="cultivation">培育</button>
+            <button class="tab-item" type="button" data-bag-tab="dex">图鉴</button>
+          </div>
+
+          <section id="bag-tab-seeds">
+            <div class="two-panel-grid">
+              <article class="card">
+                <div class="card-header">
+                  <div>
+                    <p class="eyebrow">Seed Bag</p>
+                    <h4>种子背包</h4>
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="ledger-table">
+                    <thead>
+                      <tr>
+                        <th>作物</th>
+                        <th>数量</th>
+                        <th>来源</th>
+                        <th>备注</th>
+                        <th>更新时间</th>
+                      </tr>
+                    </thead>
+                    <tbody id="seed-table-body"></tbody>
+                  </table>
+                </div>
+                <div class="feedback-area muted">种植时会优先消耗这里的种子，不足再按市价自动购买入账。</div>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <div>
+                    <p class="eyebrow">Add Seeds</p>
+                    <h4>登记种子</h4>
+                  </div>
+                </div>
+                <form id="seed-form" class="editor-grid">
+                  <label>
+                    <span>作物搜索</span>
+                    <input id="seed-crop-search" type="search" list="crop-search-datalist" placeholder="输入作物名搜索">
+                    <input id="seed-crop-id" type="hidden">
+                  </label>
+                  <label>
+                    <span>变动数量（可负数）</span>
+                    <input id="seed-quantity" type="number" value="1">
+                  </label>
+                  <label>
+                    <span>来源</span>
+                    <select id="seed-source">
+                      <option value="购买">购买</option>
+                      <option value="赛季奖励">赛季奖励</option>
+                      <option value="活动">活动</option>
+                      <option value="好友赠送">好友赠送</option>
+                      <option value="其他">其他</option>
+                    </select>
+                  </label>
+                  <label class="full-span">
+                    <span>备注（比如赛季种子到期时间）</span>
+                    <input id="seed-note" type="text">
+                  </label>
+                  <button class="accent-button full-span" type="submit">登记变动</button>
+                </form>
+                <div id="seed-feedback" class="feedback-area muted"></div>
+              </article>
+            </div>
+          </section>
+
+          <section id="bag-tab-fruits" hidden>
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Fruit Bag</p>
+                  <h4>在库果实</h4>
+                </div>
+                <div class="section-actions">
+                  <button class="ghost-button" type="button" id="fruit-select-all">全选 / 反选</button>
+                  <button class="accent-button" type="button" id="fruit-sell-button">卖出选中批次</button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="ledger-table">
+                  <thead>
+                    <tr>
+                      <th>选择</th>
+                      <th>作物</th>
+                      <th>数量</th>
+                      <th>变异词条</th>
+                      <th>倍率</th>
+                      <th>预估售价</th>
+                      <th>收获时间</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fruit-table-body"></tbody>
+                </table>
+              </div>
+              <div id="fruit-feedback" class="feedback-area muted">变异果实卖出前想清楚：培育台和图鉴都可能还要用它。</div>
+            </article>
+
+            <article class="card" style="margin-top:14px;">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Sold</p>
+                  <h4>最近卖出记录</h4>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="ledger-table">
+                  <thead>
+                    <tr>
+                      <th>卖出时间</th>
+                      <th>作物</th>
+                      <th>数量</th>
+                      <th>词条</th>
+                      <th>总收入</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fruit-sold-table-body"></tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+
+          <section id="bag-tab-cultivation" hidden>
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Cultivation</p>
+                  <h4>培育等级进度</h4>
+                </div>
+                <div class="field-label">每种植并收获一株 +10 培育值，满级 10 级售价 ×2</div>
+              </div>
+              <div id="cultivation-list" class="stack-list"></div>
+            </article>
+          </section>
+
+          <section id="bag-tab-dex" hidden>
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Collection</p>
+                  <h4>收获图鉴</h4>
+                </div>
+                <div class="field-label" id="dex-summary"></div>
+              </div>
+              <div id="dex-grid" class="dex-grid"></div>
+            </article>
+          </section>
         </section>
 
         <section class="section-panel" id="section-stats">
@@ -279,6 +570,8 @@
               <p class="section-copy">被偷时必须填偷菜人；偷别人时可以填受害者，也可以不填。</p>
             </div>
           </div>
+
+          <div class="summary-grid" id="theft-quota-panel"></div>
 
           <div class="two-panel-grid">
             <article class="card">
@@ -360,7 +653,7 @@
             </article>
           </div>
 
-          <article class="card">
+          <article class="card" style="margin-top:14px;">
             <div class="card-header">
               <div>
                 <p class="eyebrow">Recent Raids</p>
@@ -368,6 +661,43 @@
               </div>
             </div>
             <div id="raid-list" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="section-panel" id="section-exp">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Experience</p>
+              <h3>经验分享</h3>
+              <p class="section-copy">精选经验由维护者整理后随版本发布；你也可以直接在 GitHub 提交自己的经验。</p>
+            </div>
+          </div>
+
+          <div class="exp-header-actions">
+            <a class="accent-button" id="exp-submit-button" href="#" target="_blank" rel="noopener">在 GitHub 提交经验</a>
+            <a class="link-button" id="exp-issues-button" href="#" target="_blank" rel="noopener">查看社区投稿 →</a>
+          </div>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Weekly Routine</p>
+                <h4>高倍变异周流程（社区 1680x 攻略）</h4>
+              </div>
+              <div class="field-label">勾选状态保存在本机，每周一自动重置</div>
+            </div>
+            <div id="weekly-checklist" class="checklist"></div>
+          </article>
+
+          <article class="card" style="margin-top:14px;">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Curated</p>
+                <h4>精选经验</h4>
+              </div>
+            </div>
+            <div id="exp-filter-tags" class="exp-filter-tags"></div>
+            <div id="exp-list" class="exp-list"></div>
           </article>
         </section>
 
@@ -388,6 +718,19 @@
                 <label><span>等级</span><input id="player-level" type="number" min="1" max="100"></label>
                 <label><span>头像路径</span><input id="player-avatar-path" type="text"></label>
                 <label><span>小摊加成（%）</span><input id="player-stall-bonus" type="number" min="0" max="200"></label>
+              </div>
+
+              <div class="settings-block">
+                <h4>外观</h4>
+                <label>
+                  <span>主题</span>
+                  <select id="appearance-theme">
+                    <option value="system">跟随系统</option>
+                    <option value="light">简洁亮色</option>
+                    <option value="dark">暗黑</option>
+                  </select>
+                </label>
+                <p class="settings-tip">顶栏的按钮也可以快速切换亮色 / 暗黑。</p>
               </div>
 
               <div class="settings-block">
