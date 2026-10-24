@@ -1,3 +1,4 @@
+import copy
 import json
 import re
 from functools import lru_cache
@@ -8,6 +9,8 @@ from .paths import RULES_DIR, SOURCE_MARKDOWN_PATH, ensure_directories
 CROPS_JSON_PATH = RULES_DIR / "crops.json"
 WATERING_JSON_PATH = RULES_DIR / "watering_rules.json"
 MECHANICS_JSON_PATH = RULES_DIR / "game_mechanics.json"
+MUTATIONS_JSON_PATH = RULES_DIR / "mutations.json"
+EXPERIENCES_JSON_PATH = RULES_DIR / "experiences.json"
 
 
 DEFAULT_MECHANICS = {
@@ -43,6 +46,64 @@ DEFAULT_MECHANICS = {
         {"level": 9, "multiplier": 1.8, "required_points": 3600},
         {"level": 10, "multiplier": 2.0, "required_points": 4500},
     ],
+    "cultivation_points_per_harvest": 10,
+    "blessing_rules": {
+        "daily_give_limit": 10,
+        "per_crop_max": 3,
+        "daily_receive_limit": 30,
+        "reset_time": "05:00",
+    },
+    "steal_rules": {
+        "unlock_farm_level": 4,
+        "window_start": "08:00",
+        "window_end": "24:00",
+        "per_plant_max_takes": 4,
+        "per_plant_cap_ratio": 0.4,
+        "daily_quota": 100,
+        "hero_crop_immune": True,
+        "reset_time": "05:00",
+    },
+    "day_night": {
+        "day_start": "06:00",
+        "night_start": "18:00",
+    },
+    "daily_reset_time": "05:00",
+    "tier2_field": {
+        "unlock_farm_level": 44,
+        "yield_bonus_ratio": 0.5,
+    },
+    "level_stall_strategy": {
+        "hero_tail_digits": [1, 6],
+        "economy_tail_digits": [5, 0],
+        "collab_tail_digits": [4, 9],
+    },
+}
+
+
+DEFAULT_MUTATIONS = {
+    "mutation_types": [
+        {"name": "蓝色词条", "rarity": "常见", "multiplier": 1.5, "anti_steal": False, "badge": "blue", "note": "颜色系变异"},
+        {"name": "紫色词条", "rarity": "常见", "multiplier": 2.5, "anti_steal": False, "badge": "purple", "note": "高级颜色系"},
+        {"name": "材质词条", "rarity": "中等", "multiplier": 4.0, "anti_steal": False, "badge": "teal", "note": "钻石/金属/冰冻等元素效果"},
+        {"name": "巨大化", "rarity": "稀有", "multiplier": 8.0, "anti_steal": False, "badge": "giant", "note": "体型变大，与超巨化互斥"},
+        {"name": "超巨化", "rarity": "稀有", "multiplier": 10.0, "anti_steal": False, "badge": "giant", "note": "培育台专属，与巨大化互斥"},
+        {"name": "英雄变异", "rarity": "极稀有", "multiplier": 28.0, "anti_steal": True, "badge": "hero", "note": "英雄主题外观，不可被偷"},
+    ],
+    "hero_crops": [],
+    "stack_rules": {
+        "base_mutate_farm_level": 8,
+        "normal_max_entries": 3,
+        "hero_extra_entry_farm_level": 60,
+        "hero_max_entries": 4,
+        "mutually_exclusive": [["巨大化", "超巨化"]],
+    },
+    "trigger_rules": {
+        "base_chance": 0.2,
+        "blessing_is_best": True,
+        "steal_can_trigger": True,
+        "manual_water_bonus_pct": 15,
+        "last_water_high_frequency_window": True,
+    },
 }
 
 
@@ -136,9 +197,71 @@ def _parse_watering_rules(text):
     return rules
 
 
+def _mutation_badge(name):
+    text = str(name)
+    if "蓝" in text:
+        return "blue"
+    if "紫" in text:
+        return "purple"
+    if "巨" in text:
+        return "giant"
+    if "英雄" in text:
+        return "hero"
+    if "材质" in text or "元素" in text:
+        return "teal"
+    return "neutral"
+
+
+def _parse_mutation_types(text):
+    rows = _parse_markdown_table(text, "### 1. 变异词条与售价倍率")
+    types = []
+    for row in rows:
+        multiplier_text = re.sub(r"[^\d.]", "", str(row.get("售价倍率", "")))
+        note = row.get("叠加说明", "")
+        types.append(
+            {
+                "name": row["词条类型"],
+                "rarity": row.get("稀有度", ""),
+                "multiplier": float(multiplier_text) if multiplier_text else 1.0,
+                "anti_steal": "不可被偷" in note or "防偷" in note,
+                "badge": _mutation_badge(row["词条类型"]),
+                "note": note,
+            }
+        )
+    return types
+
+
+def _parse_hero_crops(text):
+    rows = _parse_markdown_table(text, "## 二、英雄变异作物完整清单")
+    hero_crops = []
+    for row in rows:
+        hero_crops.append(
+            {
+                "unlock_level": int(str(row["解锁等级"]).replace("级", "")),
+                "name": row["英雄变异名称"],
+                "base_crop_name": row["对应普通作物"],
+                "growth_label": row["成熟时间"],
+                "legacy_multiplier_note": row.get("售价倍率（S43 旧口径）", ""),
+            }
+        )
+    return hero_crops
+
+
+def _parse_mutations(text):
+    payload = copy.deepcopy(DEFAULT_MUTATIONS)
+    payload["mutation_types"] = _parse_mutation_types(text)
+    payload["hero_crops"] = _parse_hero_crops(text)
+    return payload
+
+
 def _write_json(path, payload):
     with path.open("w", encoding="utf-8") as file_handle:
         json.dump(payload, file_handle, ensure_ascii=False, indent=2)
+
+
+def _load_json_file(path):
+    with path.open("r", encoding="utf-8") as file_handle:
+        return json.load(file_handle)
 
 
 def _needs_regeneration():
@@ -146,8 +269,8 @@ def _needs_regeneration():
         return True
 
     try:
-        crops = json.loads(CROPS_JSON_PATH.read_text(encoding="utf-8"))
-        watering_rules = json.loads(WATERING_JSON_PATH.read_text(encoding="utf-8"))
+        crops = _load_json_file(CROPS_JSON_PATH)
+        watering_rules = _load_json_file(WATERING_JSON_PATH)
     except (OSError, json.JSONDecodeError):
         return True
 
@@ -164,21 +287,50 @@ def _needs_regeneration():
     return False
 
 
+def _needs_mutation_regeneration():
+    if not MUTATIONS_JSON_PATH.exists():
+        return True
+    try:
+        payload = _load_json_file(MUTATIONS_JSON_PATH)
+    except (OSError, json.JSONDecodeError):
+        return True
+    return not (
+        isinstance(payload, dict)
+        and isinstance(payload.get("mutation_types"), list)
+        and payload["mutation_types"]
+        and isinstance(payload.get("hero_crops"), list)
+        and isinstance(payload.get("stack_rules"), dict)
+    )
+
+
+def _deep_merge(base, override):
+    if isinstance(base, dict) and isinstance(override, dict):
+        merged = {}
+        for key in base.keys() | override.keys():
+            if key in base and key in override:
+                merged[key] = _deep_merge(base[key], override[key])
+            elif key in override:
+                merged[key] = copy.deepcopy(override[key])
+            else:
+                merged[key] = copy.deepcopy(base[key])
+        return merged
+    return copy.deepcopy(override)
+
+
 def ensure_rule_files():
     ensure_directories()
-    if (
-        CROPS_JSON_PATH.exists()
-        and WATERING_JSON_PATH.exists()
-        and MECHANICS_JSON_PATH.exists()
-        and not _needs_regeneration()
-    ):
-        return
 
-    source_text = SOURCE_MARKDOWN_PATH.read_text(encoding="utf-8")
-    _write_json(CROPS_JSON_PATH, _parse_crops(source_text))
-    _write_json(WATERING_JSON_PATH, _parse_watering_rules(source_text))
+    if _needs_regeneration():
+        source_text = SOURCE_MARKDOWN_PATH.read_text(encoding="utf-8")
+        _write_json(CROPS_JSON_PATH, _parse_crops(source_text))
+        _write_json(WATERING_JSON_PATH, _parse_watering_rules(source_text))
+
     if not MECHANICS_JSON_PATH.exists():
         _write_json(MECHANICS_JSON_PATH, DEFAULT_MECHANICS)
+
+    if _needs_mutation_regeneration():
+        source_text = SOURCE_MARKDOWN_PATH.read_text(encoding="utf-8")
+        _write_json(MUTATIONS_JSON_PATH, _parse_mutations(source_text))
 
 
 class RuleStore:
@@ -189,9 +341,23 @@ class RuleStore:
         ensure_rule_files()
         self.crops = self._load_json(CROPS_JSON_PATH)
         self.watering_rules = self._load_json(WATERING_JSON_PATH)
-        self.mechanics = self._load_json(MECHANICS_JSON_PATH)
+        self.mechanics = _deep_merge(
+            DEFAULT_MECHANICS,
+            self._load_json(MECHANICS_JSON_PATH),
+        )
+        self.mutations = _deep_merge(
+            DEFAULT_MUTATIONS,
+            self._load_json(MUTATIONS_JSON_PATH),
+        )
         self._crop_map = {crop["crop_id"]: crop for crop in self.crops}
         self._watering_map = {rule["natural_minutes"]: rule for rule in self.watering_rules}
+        self._mutation_type_map = {
+            mutation["name"]: mutation for mutation in self.mutations.get("mutation_types", [])
+        }
+        self._cultivation_levels = sorted(
+            self.mechanics.get("cultivation_levels", []),
+            key=lambda item: item["level"],
+        )
 
     @staticmethod
     def _load_json(path):
@@ -204,9 +370,87 @@ class RuleStore:
     def get_watering_rule(self, natural_minutes):
         return self._watering_map.get(natural_minutes)
 
+    def get_mutation_type(self, name):
+        return self._mutation_type_map.get(name)
+
+    def get_hero_crops(self):
+        return self.mutations.get("hero_crops", [])
+
     @property
     def crop_options(self):
         return sorted(self.crops, key=lambda crop: (crop["unlock_level"], crop["growth_minutes"], crop["name"]))
+
+    @property
+    def mutation_options(self):
+        return self.mutations.get("mutation_types", [])
+
+    def resolve_mutation_entries(self, names):
+        """把词条名列表解析成结构化结果；未知名与互斥冲突原样返回。"""
+        clean_names = []
+        for name in names or []:
+            text = str(name).strip()
+            if text and text not in clean_names:
+                clean_names.append(text)
+
+        stack_rules = self.mutations.get("stack_rules", {})
+        exclusive_pairs = stack_rules.get("mutually_exclusive", [])
+
+        unknown = [name for name in clean_names if name not in self._mutation_type_map]
+        conflicts = []
+        for pair in exclusive_pairs:
+            hit = [name for name in clean_names if name in pair]
+            if len(hit) > 1:
+                conflicts.extend(hit)
+
+        entries = [self._mutation_type_map[name] for name in clean_names if name in self._mutation_type_map]
+        multiplier = 1.0
+        for entry in entries:
+            multiplier *= float(entry.get("multiplier", 1.0))
+
+        has_hero = any(entry.get("anti_steal") for entry in entries)
+        if has_hero:
+            max_entries = stack_rules.get("hero_max_entries", 4)
+        else:
+            max_entries = stack_rules.get("normal_max_entries", 3)
+
+        return {
+            "names": clean_names,
+            "entries": entries,
+            "unknown": unknown,
+            "conflicts": conflicts,
+            "multiplier": round(multiplier, 4),
+            "has_hero": has_hero,
+            "max_entries": max_entries,
+        }
+
+    def get_cultivation_level(self, points):
+        """按培育值返回当前等级配置（无记录时为 1 级）。"""
+        points = int(points or 0)
+        current = self._cultivation_levels[0] if self._cultivation_levels else {"level": 1, "multiplier": 1.0, "required_points": 0}
+        for level_item in self._cultivation_levels:
+            if points >= int(level_item.get("required_points", 0)):
+                current = level_item
+        return current
+
+    def cultivation_level_by_number(self, level_number):
+        for level_item in self._cultivation_levels:
+            if int(level_item.get("level", 0)) == int(level_number):
+                return level_item
+        return self._cultivation_levels[0] if self._cultivation_levels else {"level": 1, "multiplier": 1.0}
+
+    def get_experiences(self):
+        if not EXPERIENCES_JSON_PATH.exists():
+            return {"repo_url": "", "updated_at": "", "items": []}
+        try:
+            payload = _load_json_file(EXPERIENCES_JSON_PATH)
+        except (OSError, json.JSONDecodeError):
+            return {"repo_url": "", "updated_at": "", "items": []}
+        if not isinstance(payload, dict):
+            return {"repo_url": "", "updated_at": "", "items": []}
+        payload.setdefault("repo_url", "")
+        payload.setdefault("updated_at", "")
+        payload.setdefault("items", [])
+        return payload
 
 
 @lru_cache(maxsize=1)

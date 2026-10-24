@@ -1,0 +1,178 @@
+{
+  "mutation_types": [
+    {
+      "name": "蓝色词条",
+      "rarity": "常见",
+      "multiplier": 1.5,
+      "anti_steal": false,
+      "badge": "blue",
+      "note": "颜色系变异（S43 旧口径 1.2-2 倍）"
+    },
+    {
+      "name": "紫色词条",
+      "rarity": "常见",
+      "multiplier": 2.5,
+      "anti_steal": false,
+      "badge": "purple",
+      "note": "高级颜色系（S43 旧口径颜色档上限）"
+    },
+    {
+      "name": "材质词条",
+      "rarity": "中等",
+      "multiplier": 4.0,
+      "anti_steal": false,
+      "badge": "teal",
+      "note": "钻石 / 金属 / 冰冻等元素效果（S43 旧口径 3-5 倍）"
+    },
+    {
+      "name": "巨大化",
+      "rarity": "稀有",
+      "multiplier": 8.0,
+      "anti_steal": false,
+      "badge": "giant",
+      "note": "体型变大，与超巨化互斥（S43 旧口径 5-10 倍）"
+    },
+    {
+      "name": "超巨化",
+      "rarity": "稀有",
+      "multiplier": 10.0,
+      "anti_steal": false,
+      "badge": "giant",
+      "note": "S45 果实培育台专属，与巨大化互斥"
+    },
+    {
+      "name": "英雄变异",
+      "rarity": "极稀有",
+      "multiplier": 28.0,
+      "anti_steal": true,
+      "badge": "hero",
+      "note": "英雄主题外观，自带防偷保护，不可被偷"
+    }
+  ],
+  "hero_crops": [
+    {
+      "unlock_level": 20,
+      "name": "澜莓",
+      "base_crop_name": "蓝莓",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "10-20倍"
+    },
+    {
+      "unlock_level": 30,
+      "name": "姬文菜",
+      "base_crop_name": "大白菜",
+      "growth_label": "5分钟",
+      "legacy_multiplier_note": "20-50倍"
+    },
+    {
+      "unlock_level": 40,
+      "name": "安琪辣椒",
+      "base_crop_name": "辣椒",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "15-30倍"
+    },
+    {
+      "unlock_level": 45,
+      "name": "六耳猕桃",
+      "base_crop_name": "猕猴桃",
+      "growth_label": "16小时",
+      "legacy_multiplier_note": "10-25倍"
+    },
+    {
+      "unlock_level": 50,
+      "name": "大乔灯",
+      "base_crop_name": "灯笼花",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "15-35倍"
+    },
+    {
+      "unlock_level": 55,
+      "name": "小乔麦",
+      "base_crop_name": "荞麦",
+      "growth_label": "1小时",
+      "legacy_multiplier_note": "25-60倍"
+    },
+    {
+      "unlock_level": 60,
+      "name": "马可菠萝",
+      "base_crop_name": "菠萝",
+      "growth_label": "16小时",
+      "legacy_multiplier_note": "15-40倍"
+    },
+    {
+      "unlock_level": 65,
+      "name": "公孙梨",
+      "base_crop_name": "梨",
+      "growth_label": "16小时",
+      "legacy_multiplier_note": "15-35倍"
+    },
+    {
+      "unlock_level": 70,
+      "name": "云缨桃",
+      "base_crop_name": "樱桃",
+      "growth_label": "16小时",
+      "legacy_multiplier_note": "20-45倍"
+    },
+    {
+      "unlock_level": 75,
+      "name": "哪吒莲",
+      "base_crop_name": "莲花",
+      "growth_label": "24小时",
+      "legacy_multiplier_note": "20-50倍"
+    },
+    {
+      "unlock_level": 80,
+      "name": "悟空桃",
+      "base_crop_name": "桃子",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "30-105倍"
+    },
+    {
+      "unlock_level": 85,
+      "name": "笋策",
+      "base_crop_name": "孙策",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "S44 新增，倍率随赛季"
+    },
+    {
+      "unlock_level": 90,
+      "name": "子牙姜",
+      "base_crop_name": "姜子牙",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "S44 新增，倍率随赛季"
+    },
+    {
+      "unlock_level": 95,
+      "name": "瑶药花",
+      "base_crop_name": "瑶",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "S44 新增，倍率随赛季"
+    },
+    {
+      "unlock_level": 100,
+      "name": "月露昙",
+      "base_crop_name": "露娜",
+      "growth_label": "32小时",
+      "legacy_multiplier_note": "S44 新增，倍率随赛季"
+    }
+  ],
+  "stack_rules": {
+    "base_mutate_farm_level": 8,
+    "normal_max_entries": 3,
+    "hero_extra_entry_farm_level": 60,
+    "hero_max_entries": 4,
+    "mutually_exclusive": [
+      [
+        "巨大化",
+        "超巨化"
+      ]
+    ]
+  },
+  "trigger_rules": {
+    "base_chance": 0.2,
+    "blessing_is_best": true,
+    "steal_can_trigger": true,
+    "manual_water_bonus_pct": 15,
+    "last_water_high_frequency_window": true
+  }
+}
