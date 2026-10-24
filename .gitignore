@@ -21,3 +21,4 @@ server.err.log
 .idea/
 .venv/
 venv/
+.zcode/
