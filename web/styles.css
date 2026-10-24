@@ -1,20 +1,80 @@
+/* ============================================================
+   王者农场提醒 · 简洁亮色 + 暗黑双主题
+   data-theme="light"（默认，:root）/ data-theme="dark"
+   ============================================================ */
+
 :root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --panel-2: #f2f4f7;
+  --panel-3: #e9edf2;
+  --line: #e3e7ec;
+  --line-strong: #cfd6de;
+  --ink: #1c2430;
+  --ink-soft: #5b6673;
+  --blue: #3b6ef5;
+  --blue-soft: rgba(59, 110, 245, 0.1);
+  --blue-ink: #2b5bd7;
+  --teal: #0f9e8e;
+  --teal-soft: rgba(15, 158, 142, 0.1);
+  --green: #2f9e5f;
+  --green-soft: rgba(47, 158, 95, 0.1);
+  --yellow: #c07f00;
+  --yellow-soft: rgba(192, 127, 0, 0.12);
+  --red: #d9534a;
+  --red-soft: rgba(217, 83, 74, 0.1);
+  --purple: #8a5cd6;
+  --purple-soft: rgba(138, 92, 214, 0.12);
+  --shadow: 0 1px 3px rgba(16, 24, 40, 0.07);
+  --shadow-lift: 0 4px 14px rgba(16, 24, 40, 0.1);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --chart-bg: #fafbfc;
+  --chart-plot: rgba(242, 244, 247, 0.85);
+  --chart-grid: rgba(28, 36, 48, 0.08);
+  --chart-grid-soft: rgba(28, 36, 48, 0.05);
+  --chart-text: #5b6673;
+  --chart-dot-stroke: #ffffff;
+  --slot-strip: var(--line-strong);
+  --event-plant: var(--green);
+  --event-water: var(--teal);
+  --event-harvest: var(--yellow);
+  --event-theft: var(--red);
+  --event-raid: var(--purple);
+  --event-bless: var(--blue);
+}
+
+[data-theme="dark"] {
   --bg: #111318;
-  --bg-soft: #171a22;
-  --panel: #1b1f29;
-  --panel-2: #202633;
-  --panel-3: #263143;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
+  --panel: #1a1e27;
+  --panel-2: #21262f;
+  --panel-3: #29303c;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.18);
   --ink: #f4f7fb;
   --ink-soft: rgba(222, 232, 247, 0.72);
   --blue: #5f8dff;
+  --blue-soft: rgba(95, 141, 255, 0.16);
+  --blue-ink: #b3c7ff;
   --teal: #35b3a6;
+  --teal-soft: rgba(53, 179, 166, 0.14);
   --green: #43c363;
+  --green-soft: rgba(67, 195, 99, 0.14);
   --yellow: #ffc145;
+  --yellow-soft: rgba(255, 193, 69, 0.14);
   --red: #ef6b62;
+  --red-soft: rgba(239, 107, 98, 0.14);
   --purple: #b57cff;
-  --shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+  --purple-soft: rgba(181, 124, 255, 0.16);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --chart-bg: #171a22;
+  --chart-plot: rgba(23, 26, 34, 0.85);
+  --chart-grid: rgba(255, 255, 255, 0.08);
+  --chart-grid-soft: rgba(255, 255, 255, 0.05);
+  --chart-text: rgba(222, 232, 247, 0.72);
+  --chart-dot-stroke: #14171d;
 }
 
 * {
@@ -28,60 +88,59 @@ body {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top right, rgba(95, 141, 255, 0.12), transparent 22%),
-    radial-gradient(circle at bottom left, rgba(53, 179, 166, 0.09), transparent 20%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  transition: background 160ms ease, color 160ms ease;
 }
 
 .app-shell {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 264px minmax(0, 1fr);
+  gap: 20px;
   min-height: 100vh;
-  padding: 22px;
+  padding: 20px;
 }
 
 .sidebar,
 .card {
-  background: linear-gradient(180deg, rgba(27, 31, 41, 0.96), rgba(22, 26, 34, 0.96));
+  background: var(--panel);
   border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 22px 18px;
-  border-radius: 26px;
+  gap: 18px;
+  padding: 20px 16px;
 }
 
 .brand-block {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--blue), #325cb6);
-  font-size: 1.6rem;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--blue);
+  color: #fff;
+  font-size: 1.35rem;
   font-weight: 800;
 }
 
 .brand-kicker,
 .eyebrow {
   margin: 0;
-  color: var(--teal);
-  font-size: 0.82rem;
-  letter-spacing: 0.28em;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
@@ -92,18 +151,19 @@ body {
 .settings-block h4 {
   margin: 4px 0 0;
   font-family: Inter, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .brand-block h1 {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
 }
 
 .sidebar-profile {
-  padding: 18px;
-  border-radius: 20px;
-  background: var(--panel-3);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
 }
 
 .profile-title {
@@ -116,18 +176,19 @@ body {
 .profile-avatar {
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--blue), var(--purple));
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: var(--blue);
+  color: #fff;
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .profile-name {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .profile-subtitle,
@@ -142,40 +203,53 @@ body {
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .profile-chip {
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
 .profile-chip span {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
 }
 
 .profile-chip strong {
   display: block;
   margin-top: 4px;
-  font-size: 1rem;
+  font-size: 0.94rem;
 }
 
 .nav-stack {
   display: grid;
-  gap: 8px;
+  gap: 4px;
 }
 
 .nav-item,
 .ghost-button,
 .accent-button,
-.legend-button {
-  border: 0;
-  border-radius: 16px;
+.legend-button,
+.theme-toggle,
+.tab-item,
+.exp-filter-tag,
+.check-item input {
   font: inherit;
+}
+
+.nav-item,
+.ghost-button,
+.accent-button,
+.legend-button,
+.theme-toggle {
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 .nav-item,
@@ -186,87 +260,113 @@ body {
 }
 
 .nav-item {
-  padding: 13px 14px;
+  padding: 10px 12px;
   text-align: left;
+  font-size: 0.95rem;
+}
+
+.nav-item:hover {
+  background: var(--panel-2);
 }
 
 .nav-item.active {
-  background: rgba(95, 141, 255, 0.18);
-  color: #dfe9ff;
-}
-
-.nav-item:hover,
-.ghost-button:hover,
-.accent-button:hover,
-.legend-button:hover {
-  transform: translateY(-1px);
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+  border-color: var(--blue-soft);
+  font-weight: 600;
 }
 
 .sidebar-footer {
   margin-top: auto;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sidebar-pill {
-  padding: 10px 12px;
-  border-radius: 999px;
-  font-size: 0.84rem;
-  background: rgba(53, 179, 166, 0.12);
-  color: #7ce8db;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  background: var(--teal-soft);
+  color: var(--teal);
+  border: 1px solid var(--line);
 }
 
 .sidebar-pill-blue {
-  background: rgba(95, 141, 255, 0.12);
-  color: #b3c7ff;
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+}
+
+.sidebar-pill-strong {
+  font-weight: 700;
 }
 
 .main-shell {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-}
-
-.card,
-.topbar {
-  border-radius: 26px;
+  gap: 16px;
+  min-width: 0;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
   gap: 18px;
-  padding: 24px 26px;
+  padding: 18px 22px;
 }
 
 .topbar h2 {
-  font-size: 2.15rem;
+  font-size: 1.7rem;
 }
 
-.topbar-metrics {
+.topbar-actions {
   display: flex;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
 
+.topbar-metrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .topbar-chip {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
-  min-width: 160px;
+  border: 1px solid var(--line);
+  min-width: 150px;
 }
 
 .topbar-chip span {
   display: block;
-  font-size: 0.84rem;
+  font-size: 0.8rem;
   color: var(--ink-soft);
 }
 
 .topbar-chip strong {
   display: block;
-  margin-top: 6px;
-  font-size: 1.35rem;
+  margin-top: 4px;
+  font-size: 1.2rem;
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.theme-toggle:hover {
+  border-color: var(--line-strong);
 }
 
 .section-panel {
@@ -298,15 +398,13 @@ body {
   margin-bottom: 14px;
 }
 
-.section-header h3,
-.card-header h4,
-.settings-block h4 {
-  font-size: 1.85rem;
+.section-header h3 {
+  font-size: 1.4rem;
 }
 
 .card-header h4,
 .settings-block h4 {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
 
 .summary-grid,
@@ -315,12 +413,12 @@ body {
 .farm-layout,
 .settings-grid {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .summary-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .compact-grid {
@@ -328,28 +426,30 @@ body {
 }
 
 .summary-card {
-  padding: 18px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(32, 38, 51, 0.96), rgba(27, 31, 41, 0.96));
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--panel);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow);
 }
 
 .summary-card span {
   display: block;
   color: var(--ink-soft);
-  font-size: 0.9rem;
+  font-size: 0.84rem;
 }
 
 .summary-card strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.9rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .summary-card p {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--ink-soft);
+  font-size: 0.84rem;
 }
 
 .two-panel-grid {
@@ -361,7 +461,7 @@ body {
 }
 
 .card {
-  padding: 20px 22px;
+  padding: 18px 20px;
 }
 
 .table-wrap {
@@ -375,11 +475,16 @@ body {
 
 .ledger-table th,
 .ledger-table td {
-  padding: 12px 10px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--line);
   text-align: left;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   vertical-align: top;
+  white-space: nowrap;
+}
+
+.ledger-table td.wrap-cell {
+  white-space: normal;
 }
 
 .ledger-table th {
@@ -388,21 +493,21 @@ body {
 }
 
 .amount-positive {
-  color: #88e7a0;
+  color: var(--green);
 }
 
 .amount-negative {
-  color: #ff8a81;
+  color: var(--red);
 }
 
 .stack-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .stack-item {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
   background: var(--panel-2);
   border: 1px solid var(--line);
 }
@@ -421,7 +526,7 @@ body {
 
 .inline-field {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .inline-field input,
@@ -433,9 +538,16 @@ textarea {
   background: var(--panel-2);
   color: var(--ink);
   border: 1px solid var(--line-strong);
-  border-radius: 16px;
-  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
   font: inherit;
+}
+
+label:focus-within input,
+label:focus-within select,
+textarea:focus {
+  outline: none;
+  border-color: var(--blue);
 }
 
 textarea {
@@ -445,37 +557,67 @@ textarea {
 .ghost-button,
 .accent-button,
 .legend-button {
-  padding: 12px 16px;
+  padding: 10px 14px;
 }
 
 .ghost-button {
   background: var(--panel-2);
-  color: var(--ink);
+  border-color: var(--line);
+}
+
+.ghost-button:hover {
+  border-color: var(--line-strong);
 }
 
 .ghost-button.danger {
-  color: #ff8a81;
+  color: var(--red);
 }
 
 .accent-button {
-  color: #f7fbff;
-  background: linear-gradient(135deg, var(--blue), #4467d5);
-  font-weight: 700;
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+  font-weight: 600;
 }
+
+.accent-button:hover {
+  filter: brightness(1.06);
+}
+
+.link-button {
+  border: 0;
+  background: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--blue);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-button:hover {
+  background: var(--blue-soft);
+}
+
+/* ---------------- 农场格子 ---------------- */
 
 .farm-layout {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .field-card {
-  padding: 18px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(32, 38, 51, 0.96), rgba(24, 29, 40, 0.96));
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--panel);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow);
 }
 
 .field-card.locked {
-  opacity: 0.72;
+  opacity: 0.65;
 }
 
 .field-top {
@@ -483,20 +625,21 @@ textarea {
   justify-content: space-between;
   align-items: start;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .field-top h4 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .field-badge {
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 0.8rem;
-  background: rgba(95, 141, 255, 0.14);
-  color: #b8cbff;
+  font-size: 0.78rem;
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+  white-space: nowrap;
 }
 
 .field-meta {
@@ -507,11 +650,12 @@ textarea {
 }
 
 .field-chip {
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .slot-grid {
@@ -522,49 +666,140 @@ textarea {
 
 .slot-card {
   aspect-ratio: 1 / 1;
-  padding: 8px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background:
-    linear-gradient(180deg, rgba(91, 63, 50, 0.92), rgba(61, 42, 34, 0.96));
+  padding: 8px 8px 8px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--slot-strip);
+  background: var(--panel-2);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.slot-card.is-planned {
+  --slot-strip: var(--blue);
+}
+
+.slot-card.is-planted {
+  --slot-strip: var(--teal);
+}
+
+.slot-card.is-ready {
+  --slot-strip: var(--green);
+}
+
+.slot-card.is-mutated {
+  background: var(--purple-soft);
+}
+
+.slot-card.is-hero {
+  background: var(--yellow-soft);
 }
 
 .slot-card.locked {
-  background: linear-gradient(180deg, rgba(77, 84, 96, 0.9), rgba(50, 56, 66, 0.95));
+  background: transparent;
+  border-style: dashed;
+  border-left-style: dashed;
+  color: var(--ink-soft);
   cursor: not-allowed;
 }
 
 .slot-card.selected {
-  outline: 2px solid var(--blue);
-  box-shadow: 0 0 0 1px rgba(95, 141, 255, 0.25);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px var(--blue-soft);
 }
 
 .slot-code {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.68rem;
+  color: var(--ink-soft);
 }
 
 .slot-crop {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 700;
 }
 
 .slot-status {
-  font-size: 0.76rem;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
   line-height: 1.35;
 }
+
+.slot-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+/* ---------------- 徽章 ---------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-blue {
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+  border-color: var(--blue-soft);
+}
+
+.badge-purple {
+  background: var(--purple-soft);
+  color: var(--purple);
+  border-color: var(--purple-soft);
+}
+
+.badge-giant {
+  background: var(--yellow-soft);
+  color: var(--yellow);
+  border-color: var(--yellow-soft);
+}
+
+.badge-hero {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: var(--red-soft);
+}
+
+.badge-green {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: var(--green-soft);
+}
+
+.badge-teal {
+  background: var(--teal-soft);
+  color: var(--teal);
+  border-color: var(--teal-soft);
+}
+
+.badge-neutral {
+  background: var(--panel-3);
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
+
+/* ---------------- 编辑器 / 表单 ---------------- */
 
 .editor-grid,
 .planner-grid,
 .settings-grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .editor-grid,
@@ -585,28 +820,28 @@ textarea {
 
 .feedback-area {
   margin-top: 14px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 .planner-results {
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .plan-card {
-  padding: 18px;
-  border-radius: 20px;
+  padding: 16px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(32, 38, 51, 0.96), rgba(27, 31, 41, 0.96));
+  background: var(--panel-2);
 }
 
 .plan-card.warning {
-  border-color: rgba(239, 107, 98, 0.32);
+  border-color: var(--red-soft);
 }
 
 .plan-card strong {
   display: block;
   margin-bottom: 8px;
-  font-size: 1.02rem;
+  font-size: 1rem;
 }
 
 .plan-tags {
@@ -617,21 +852,23 @@ textarea {
 }
 
 .plan-tag {
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 999px;
-  font-size: 0.8rem;
-  background: rgba(95, 141, 255, 0.12);
-  color: #b7cbff;
+  font-size: 0.78rem;
+  background: var(--blue-soft);
+  color: var(--blue-ink);
 }
 
 .plan-tag.warning {
-  background: rgba(239, 107, 98, 0.16);
-  color: #ffb6af;
+  background: var(--red-soft);
+  color: var(--red);
 }
+
+/* ---------------- 统计图表 ---------------- */
 
 .stats-toolbar {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: 200px minmax(0, 1fr);
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -639,7 +876,7 @@ textarea {
 .legend-switch {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   margin-top: 8px;
 }
 
@@ -649,16 +886,15 @@ textarea {
 }
 
 .legend-button.active {
-  color: #f9fbff;
   box-shadow: inset 0 0 0 1px currentColor;
 }
 
 .chart-shell {
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: #161922;
+  background: var(--chart-bg);
 }
 
 #stats-chart {
@@ -676,11 +912,13 @@ textarea {
   transform: translateY(4px);
   transition: opacity 120ms ease, transform 120ms ease;
   padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(9, 11, 16, 0.94);
-  color: #f3f7fd;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
   font-size: 0.84rem;
   max-width: 240px;
+  box-shadow: var(--shadow-lift);
 }
 
 .chart-tooltip.visible {
@@ -688,15 +926,20 @@ textarea {
   transform: translateY(0);
 }
 
+/* ---------------- 设置 ---------------- */
+
 .settings-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .settings-block {
   padding: 16px;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background: var(--panel-2);
   border: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  align-content: start;
 }
 
 .toggle-line {
@@ -709,6 +952,358 @@ textarea {
   width: 18px;
   height: 18px;
 }
+
+/* ---------------- Tab 页签（背包 / 经验筛选） ---------------- */
+
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+
+.tab-item {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.tab-item:hover {
+  color: var(--ink);
+}
+
+.tab-item.active {
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .tab-item.active {
+  background: var(--panel-3);
+}
+
+/* ---------------- 进度条（祝福 / 配额 / 培育） ---------------- */
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--panel-3);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+  transition: width 200ms ease;
+}
+
+.progress-fill.green {
+  background: var(--green);
+}
+
+.progress-fill.red {
+  background: var(--red);
+}
+
+.quota-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+
+.quota-row .quota-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.88rem;
+}
+
+/* ---------------- 每日时刻表 ---------------- */
+
+.clock-list {
+  display: grid;
+  gap: 8px;
+}
+
+.clock-item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+
+.clock-item .clock-time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-item .clock-label {
+  color: var(--ink-soft);
+}
+
+.clock-item.next {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.clock-item.next .clock-label {
+  color: var(--ink);
+}
+
+.clock-item .clock-countdown {
+  font-variant-numeric: tabular-nums;
+  color: var(--blue-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.clock-item.passed {
+  opacity: 0.55;
+}
+
+/* ---------------- 周流程清单 ---------------- */
+
+.checklist {
+  display: grid;
+  gap: 8px;
+}
+
+.check-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.check-item input {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: var(--blue);
+}
+
+.check-item input:checked + .check-body {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+.check-body strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.check-body .muted {
+  font-size: 0.84rem;
+}
+
+/* ---------------- 收益计算器 ---------------- */
+
+.calc-breakdown {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.calc-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
+.calc-row:last-child {
+  border-bottom: 0;
+}
+
+.calc-row.total {
+  background: var(--blue-soft);
+  font-weight: 700;
+}
+
+.calc-row .calc-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.advisor-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--line-strong);
+  background: var(--panel-2);
+  display: grid;
+  gap: 8px;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.compare-table th:first-child,
+.compare-table td:first-child {
+  text-align: left;
+}
+
+.compare-table th {
+  color: var(--ink-soft);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+}
+
+.compare-table tr.is-recommended td {
+  background: var(--green-soft);
+}
+
+/* ---------------- 图鉴 ---------------- */
+
+.dex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 10px;
+}
+
+.dex-cell {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  font-size: 0.84rem;
+}
+
+.dex-cell.collected {
+  border-color: var(--green-soft);
+  background: var(--green-soft);
+}
+
+.dex-cell .dex-name {
+  font-weight: 700;
+}
+
+.dex-cell .dex-sub {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  margin-top: 3px;
+}
+
+.dex-cell.missing {
+  opacity: 0.55;
+}
+
+/* ---------------- 经验分享 ---------------- */
+
+.exp-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.exp-filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.exp-filter-tag {
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.exp-filter-tag.active {
+  border-color: var(--blue);
+  color: var(--blue-ink);
+  background: var(--blue-soft);
+  font-weight: 600;
+}
+
+.exp-card {
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 8px;
+}
+
+.exp-card h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.exp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.exp-body {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.exp-source {
+  font-size: 0.8rem;
+}
+
+.exp-list {
+  display: grid;
+  gap: 12px;
+}
+
+/* ---------------- 响应式 ---------------- */
 
 @media (max-width: 1280px) {
   .app-shell,
@@ -725,5 +1320,20 @@ textarea {
 
   .app-shell {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .nav-stack {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sidebar-footer {
+    margin-top: 0;
+    width: 100%;
   }
 }
