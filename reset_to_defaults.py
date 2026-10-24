@@ -48,6 +48,10 @@ def reset_database():
             DELETE FROM activity_logs;
             DELETE FROM raid_logs;
             DELETE FROM theft_logs;
+            DELETE FROM seed_inventory;
+            DELETE FROM fruit_inventory;
+            DELETE FROM blessing_logs;
+            DELETE FROM cultivation_progress;
             DELETE FROM sqlite_sequence;
             """
         )

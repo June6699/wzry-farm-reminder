@@ -36,6 +36,9 @@ DEFAULT_CONFIG = {
         "auto_use_watering_strategy": True,
         "search_horizon_days": 14,
     },
+    "appearance": {
+        "theme": "system",
+    },
     "meta": {
         "created_at": "",
         "updated_at": "",
@@ -140,6 +143,10 @@ def sanitize_config(config):
         planner["anti_theft_safe_start"] = DEFAULT_CONFIG["planner"]["anti_theft_safe_start"]
     if not _is_valid_hhmm(planner.get("anti_theft_safe_end")):
         planner["anti_theft_safe_end"] = DEFAULT_CONFIG["planner"]["anti_theft_safe_end"]
+
+    appearance = merged["appearance"]
+    if appearance.get("theme") not in ("system", "light", "dark"):
+        appearance["theme"] = DEFAULT_CONFIG["appearance"]["theme"]
 
     now_text = datetime.now().isoformat(timespec="seconds")
     meta = merged["meta"]
